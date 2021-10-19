@@ -1,0 +1,5 @@
+enable_testing()
+include(GoogleTest)
+add_executable(test "role.cpp" "deck.cpp")
+find_package(Threads)
+target_link_libraries(test avalon gtest gtest_main Threads::Threads)

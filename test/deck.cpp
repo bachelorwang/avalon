@@ -3,9 +3,18 @@
 
 using namespace avalon;
 
-TEST(deck, d5) {
-  constexpr int8_t player_count = 5;
-  auto deck = create_deck<player_count, Role::Merlin, Role::Assassin>();
-  ASSERT_EQ(GoodNum<player_count>::value, good_role_count(deck));
-  ASSERT_EQ(EvilNum<player_count>::value, evil_role_count(deck));
+template <int8_t TCount>
+void test_deck() {
+  auto deck = create_deck<TCount, Role::Merlin, Role::Assassin>();
+  ASSERT_EQ(GoodNum<TCount>::value, good_role_count(deck));
+  ASSERT_EQ(EvilNum<TCount>::value, evil_role_count(deck));
+}
+
+TEST(deck, count) {
+  test_deck<5>();
+  test_deck<6>();
+  test_deck<7>();
+  test_deck<8>();
+  test_deck<9>();
+  test_deck<10>();
 }

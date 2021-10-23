@@ -16,6 +16,13 @@ enum class Role : char {
   Minion
 };
 
+enum class Mark : char { Unknown, Evil, Good, MerlinOrMorcana };
+
+struct Predict {
+  Mark mark;
+  Role real;
+};
+
 template <Role... TRoles>
 using role_sequence = std::integer_sequence<Role, TRoles...>;
 
@@ -36,14 +43,14 @@ constexpr bool role_in(Role role, std::integer_sequence<Role, TRoles...>) {
 
 }  // namespace detail
 
-template <Role TRole>
-struct is_evil {
-  static constexpr bool value = detail::role_in(TRole, detail::evil_sequence{});
-};
+constexpr bool is_evil(Role role) {
+  return detail::role_in(role, detail::evil_sequence{});
+}
 
-template <Role TRole>
-struct is_good {
-  static constexpr bool value = detail::role_in(TRole, detail::good_sequence{});
-};
+constexpr bool is_good(Role role) {
+  return detail::role_in(role, detail::good_sequence{});
+}
+
+Mark mark_as(Role from, Role to);
 
 }  // namespace avalon

@@ -4,35 +4,35 @@
 namespace avalon {
 
 template <player_count_t>
-struct team_build_threshold;
+struct team_build_requirement;
 
 template <>
-struct team_build_threshold<5> {
+struct team_build_requirement<5> {
   static constexpr int32_t value[round_count] = {2, 3, 2, 3, 3};
 };
 
 template <>
-struct team_build_threshold<6> {
+struct team_build_requirement<6> {
   static constexpr int32_t value[round_count] = {2, 3, 4, 3, 4};
 };
 
 template <>
-struct team_build_threshold<7> {
+struct team_build_requirement<7> {
   static constexpr int32_t value[round_count] = {2, 3, 3, 4, 4};
 };
 
 template <>
-struct team_build_threshold<8> {
+struct team_build_requirement<8> {
   static constexpr int32_t value[round_count] = {3, 4, 4, 5, 5};
 };
 
 template <>
-struct team_build_threshold<9> {
+struct team_build_requirement<9> {
   static constexpr int32_t value[round_count] = {3, 4, 4, 5, 5};
 };
 
 template <>
-struct team_build_threshold<10> {
+struct team_build_requirement<10> {
   static constexpr int32_t value[round_count] = {3, 4, 4, 5, 5};
 };
 

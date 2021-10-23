@@ -1,20 +1,20 @@
 #pragma once
-#include <cstdint>
+#include "avalon/def.hpp"
 #include <utility>
 
 namespace avalon {
 
-template <int8_t TPlayerCount>
-constexpr auto quest_failure_threshold(int8_t round)
-    -> std::enable_if_t<(TPlayerCount >= 7), int8_t> {
+template <player_count_t TCount>
+constexpr auto quest_failure_threshold(round_index_t round)
+    -> std::enable_if_t<(TCount >= 7), int32_t> {
   if (round == 3)
     return 2;
   return 1;
 }
 
-template <int8_t TPlayerCount>
-constexpr auto quest_failure_threshold(int8_t round)
-    -> std::enable_if_t<(TPlayerCount < 7), int8_t> {
+template <player_count_t TCount>
+constexpr auto quest_failure_threshold(round_index_t round)
+    -> std::enable_if_t<(TCount < 7), int32_t> {
   return 1;
 }
 

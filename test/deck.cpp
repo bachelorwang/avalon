@@ -3,7 +3,7 @@
 
 using namespace avalon;
 
-template <int8_t TCount>
+template <player_count_t TCount>
 void test_deck() {
   auto deck = create_deck<TCount, Role::Merlin, Role::Assassin>();
   ASSERT_EQ(GoodNum<TCount>::value, good_role_count(deck));

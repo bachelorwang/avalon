@@ -1,5 +1,12 @@
 #pragma once
+#include <cassert>
 #include <cstdint>
+
+#define AVALON_CHECK(expr, failure_return) \
+  if (!(expr)) {                           \
+    assert(false && #expr);                \
+    failure_return;                        \
+  }
 
 namespace avalon {
 

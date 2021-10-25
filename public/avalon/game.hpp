@@ -14,7 +14,7 @@ bool team_build_passed(player_count_t approve) {
 
 template <player_count_t TCount>
 bool quest_succeed(round_index_t round, player_count_t approve) {
-  const auto member_count = team_build_requirement<TCount>::value[round];
+  const auto member_count = TeamBuildRequirement<TCount>::value[round];
   assert(approve <= member_count);
   auto minimum = (member_count - quest_failure_threshold<TCount>(round));
   return approve > minimum;

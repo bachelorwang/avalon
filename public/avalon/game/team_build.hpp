@@ -31,6 +31,35 @@ struct Team {
   }
 };
 
+enum class Ballot { Undecided, Disapprove, Approve };
+
+template <player_count_t TCount>
+struct BallotBox {
+  void reset() {
+    voted_ = 0;
+    for (player_index_t i = 0; i < TCount; ++i)
+      ballots_[i] = Ballot::Undecided;
+  }
+
+  void vote(player_index_t i, Ballot b) {
+    AVALON_CHECK(i >= 0 && i < TCount, return );
+    voted_ = 0;
+    ballots_[i] = b;
+    for (player_index_t i = 0; i < TCount; ++i) {
+      if (Ballot::Undecided != ballots_[i])
+        ++voted_;
+    }
+  }
+
+  inline Ballot ballot(player_index_t i) const { return ballots_[i]; }
+
+  inline player_count_t voted() const { return voted_; }
+
+ private:
+  Ballot ballots_[TCount];
+  player_count_t voted_;
+};
+
 template <>
 struct TeamBuildRequirement<5> {
   static constexpr player_count_t max_size = 3;

@@ -51,16 +51,36 @@ TEST(game, quest_succeed) {
   ASSERT_FALSE(quest_succeed<7>(4, 3));
 }
 
-TEST(game, game_status) {
+TEST(game, full_progress) {
   GameStatus<5> status;
   status.start_next_round();
   EXPECT_EQ(0, status.round());
+  EXPECT_EQ(0, status.voted());
+  EXPECT_EQ(0, status.succeed_quest_count());
   EXPECT_EQ(GamePhase::TeamBuilding, status.phase());
   Team<5> team;
   team.count = 2;
-  team.members[0] = 0;
-  team.members[1] = 1;
+  team.members[0] = 1;
+  team.members[1] = 3;
   ASSERT_TRUE(team.valid(0));
   status.assign_team(team);
   EXPECT_EQ(GamePhase::TeamBuildVoting, status.phase());
+
+  for (player_index_t i = 0; i < status.player_count; ++i) {
+    status.vote(i, Ballot::Approve);
+  }
+  status.vote(4, Ballot::Disapprove);
+  status.end_vote();
+  EXPECT_EQ(GamePhase::QuestDetermining, status.phase());
+
+  status.decide(1, QuestCard::Success);
+  status.decide(3, QuestCard::Success);
+  status.end_quest();
+  EXPECT_EQ(GamePhase::RoundEnded, status.phase());
+
+  status.start_next_round();
+  EXPECT_EQ(GamePhase::TeamBuilding, status.phase());
+  EXPECT_EQ(1, status.round());
+  EXPECT_EQ(0, status.voted());
+  EXPECT_EQ(1, status.succeed_quest_count());
 }

@@ -31,6 +31,30 @@ struct Team {
   }
 };
 
+enum class QuestCard { Success, Fail };
+
+template <player_count_t TCount>
+struct Quest {
+  using Requirement = TeamBuildRequirement<TCount>;
+  static constexpr player_count_t max_team_size = Requirement::max_size;
+  player_count_t count;
+  QuestCard cards[max_team_size];
+
+  void reset(int round) {
+    count = Requirement::value[round];
+    for (player_index_t i = 0; i < count; ++i) {
+      cards[i] = QuestCard::Success;
+    }
+  }
+
+  bool valid(int round) const {
+    auto req = Requirement::value[round];
+    if (count != req)
+      return false;
+    return true;
+  }
+};
+
 enum class Ballot { Undecided, Disapprove, Approve };
 
 template <player_count_t TCount>

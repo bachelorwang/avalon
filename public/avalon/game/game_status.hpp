@@ -19,7 +19,8 @@ template <player_count_t TCount>
 class GameStatus {
  public:
   static constexpr player_count_t player_count = TCount;
-  static constexpr auto team_build_req = TeamBuildRequirement<TCount>::value;
+  static constexpr auto team_build_requirement =
+      TeamBuildRequirement<TCount>::value;
 
  public:
   GameStatus() { reset(); }
@@ -39,16 +40,16 @@ class GameStatus {
   inline GameResult result() const { return result_; }
   inline GamePhase phase() const { return phase_; }
   inline player_index_t leader() const { return learder_; }
+  inline player_index_t merlin() const { return merlin_index_; }
   inline round_index_t round() const { return round_; }
   inline round_count_t voted() const { return voted_; }
   inline round_count_t succeed_quest_count() const {
     return succeed_quest_count_;
   }
 
-  void start(player_index_t merlin) {
+  void setup(player_index_t merlin) {
     AVALON_CHECK(-1 == round_, return;);
     merlin_index_ = merlin;
-    start_next_round();
   }
 
   bool start_next_round() {
@@ -87,6 +88,7 @@ class GameStatus {
       phase_ = GamePhase::QuestDetermining;
       voted_ = 0;
     } else {
+      phase_ = GamePhase::RoundEnded;
       ++voted_;
     }
 
@@ -109,7 +111,7 @@ class GameStatus {
       ++succeed_quest_count_;
     }
 
-    const auto failed_quest_count = round_count - succeed_quest_count_;
+    const auto failed_quest_count = round_ - succeed_quest_count_;
     if (succeed_quest_count_ == min_quest_count) {
       phase_ = GamePhase::Assassinating;
     } else if (failed_quest_count == min_quest_count) {

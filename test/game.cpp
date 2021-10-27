@@ -53,7 +53,7 @@ TEST(game, quest_succeed) {
 
 TEST(game, full_progress) {
   GameStatus<5> status;
-  status.start_next_round();
+  status.start(2);
   EXPECT_EQ(0, status.round());
   EXPECT_EQ(0, status.voted());
   EXPECT_EQ(0, status.succeed_quest_count());

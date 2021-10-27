@@ -66,7 +66,7 @@ struct BallotBox {
   }
 
   void vote(player_index_t i, Ballot b) {
-    AVALON_CHECK(i >= 0 && i < TCount, return );
+    AVALON_CHECK(i >= 0 && i < TCount, return; );
     voted_ = 0;
     ballots_[i] = b;
     for (player_index_t i = 0; i < TCount; ++i) {

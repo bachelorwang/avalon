@@ -45,8 +45,15 @@ class GameStatus {
     return succeed_quest_count_;
   }
 
+  void start(player_index_t merlin) {
+    AVALON_CHECK(-1 == round_, return;);
+    merlin_index_ = merlin;
+    start_next_round();
+  }
+
   bool start_next_round() {
-    AVALON_CHECK(GamePhase::RoundEnded == phase_, return false);
+    AVALON_CHECK(-1 != merlin_index_, return false;);
+    AVALON_CHECK(GamePhase::RoundEnded == phase_, return false;);
 
     ballot_box_.reset();
     ++round_;
@@ -56,7 +63,7 @@ class GameStatus {
   }
 
   bool assign_team(Team<TCount> team) {
-    AVALON_CHECK(GamePhase::TeamBuilding == phase_, return false);
+    AVALON_CHECK(GamePhase::TeamBuilding == phase_, return false;);
 
     if (!team.valid(round_))
       return false;
@@ -67,7 +74,7 @@ class GameStatus {
   }
 
   void end_vote() {
-    AVALON_CHECK(GamePhase::TeamBuildVoting == phase_, return );
+    AVALON_CHECK(GamePhase::TeamBuildVoting == phase_, return;);
 
     player_count_t approved = 0;
     for (player_index_t i = 0; i < TCount; ++i) {
@@ -90,7 +97,7 @@ class GameStatus {
   }
 
   void end_quest() {
-    AVALON_CHECK(GamePhase::QuestDetermining == phase_, return );
+    AVALON_CHECK(GamePhase::QuestDetermining == phase_, return;);
 
     player_count_t fail = 0;
     for (player_index_t i = 0; i < quest_.count; ++i) {
@@ -114,8 +121,8 @@ class GameStatus {
   }
 
   void assassinate(player_index_t i) {
-    AVALON_CHECK(GamePhase::Assassinating == phase_, return );
-    AVALON_CHECK(i >= 0, return );
+    AVALON_CHECK(GamePhase::Assassinating == phase_, return;);
+    AVALON_CHECK(i >= 0, return;);
 
     if (i == merlin_index_)
       result_ = GameResult::EvilWinned;

@@ -5,7 +5,7 @@
 #define AVALON_CHECK(expr, failure_return) \
   if (!(expr)) {                           \
     assert(false && #expr);                \
-    failure_return;                        \
+    failure_return                         \
   }
 
 namespace avalon {

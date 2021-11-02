@@ -77,7 +77,6 @@ GameStatus<TCount> create_game_auto(round_index_t round,
     }
     status.end_quest();
     success = !success;
-    std::cout << i << std::endl;
   }
 
   return status;
@@ -105,37 +104,60 @@ TEST(game, team_build_failed) {
   EXPECT_EQ(GamePhase::RoundEnded, status.phase());
 }
 
-TEST(game, full_progress) {
+TEST(game, team_build_failed_5_times) {
   GameStatus<5> status;
-  status.setup(2);
-  status.start_next_round();
-  EXPECT_EQ(0, status.round());
-  EXPECT_EQ(0, status.voted());
-  EXPECT_EQ(0, status.succeed_quest_count());
-  EXPECT_EQ(GamePhase::TeamBuilding, status.phase());
+  status.setup(1);
   Team<5> team;
-  team.count = status.team_build_requirement[status.round()];
-  team.members[0] = 1;
-  team.members[1] = 3;
-  ASSERT_TRUE(team.valid(0));
-  status.assign_team(team);
-  EXPECT_EQ(GamePhase::TeamBuildVoting, status.phase());
-
-  for (player_index_t i = 0; i < status.player_count; ++i) {
-    status.vote(i, Ballot::Approve);
+  team.members[0] = 0;
+  team.members[1] = 1;
+  team.members[2] = 2;
+  for (size_t i = 0; i < 5; ++i) {
+    status.start_next_round();
+    team.count = status.team_build_requirement[status.round()];
+    status.assign_team(team);
+    status.end_vote();
+    EXPECT_EQ(i + 1, status.voted());
   }
-  status.vote(4, Ballot::Disapprove);
-  status.end_vote();
-  EXPECT_EQ(GamePhase::QuestDetermining, status.phase());
+  EXPECT_EQ(GamePhase::GameEnded, status.phase());
+  ASSERT_EQ(GameResult::EvilWinned, status.result());
+}
 
-  status.decide(1, QuestCard::Success);
-  status.decide(3, QuestCard::Success);
-  status.end_quest();
-  EXPECT_EQ(GamePhase::RoundEnded, status.phase());
-
+TEST(game, team_build_failed_4_times_then_reset) {
+  GameStatus<5> status;
+  status.setup(1);
+  Team<5> team;
+  team.members[0] = 0;
+  team.members[1] = 1;
+  team.members[2] = 2;
+  for (size_t i = 0; i < 4; ++i) {
+    status.start_next_round();
+    team.count = status.team_build_requirement[status.round()];
+    status.assign_team(team);
+    status.end_vote();
+    EXPECT_EQ(i + 1, status.voted());
+  }
   status.start_next_round();
-  EXPECT_EQ(GamePhase::TeamBuilding, status.phase());
-  EXPECT_EQ(1, status.round());
+  team.count = status.team_build_requirement[status.round()];
+  status.assign_team(team);
+  status.vote(0, Ballot::Approve);
+  status.vote(1, Ballot::Approve);
+  status.vote(2, Ballot::Approve);
+  status.end_vote();
   EXPECT_EQ(0, status.voted());
-  EXPECT_EQ(1, status.succeed_quest_count());
+}
+
+TEST(game, full_progress_assassinated) {
+  auto status = create_game_auto<5>(5, 2);
+  ASSERT_EQ(GamePhase::Assassinating, status.phase());
+  status.assassinate(2);
+  ASSERT_EQ(GamePhase::GameEnded, status.phase());
+  ASSERT_EQ(GameResult::EvilWinned, status.result());
+}
+
+TEST(game, full_progress_assassination_failed) {
+  auto status = create_game_auto<5>(5, 1);
+  ASSERT_EQ(GamePhase::Assassinating, status.phase());
+  status.assassinate(2);
+  ASSERT_EQ(GamePhase::GameEnded, status.phase());
+  ASSERT_EQ(GameResult::GoodWinned, status.result());
 }

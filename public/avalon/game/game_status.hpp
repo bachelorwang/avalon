@@ -57,9 +57,10 @@ class GameStatus {
     AVALON_CHECK(GamePhase::RoundEnded == phase_, return false;);
 
     ballot_box_.reset();
-    ++round_;
     assign_next_leader();
     phase_ = GamePhase::TeamBuilding;
+    if (voted_ == 0)
+      ++round_;
     return true;
   }
 

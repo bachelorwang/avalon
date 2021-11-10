@@ -14,8 +14,8 @@ struct Team {
   player_count_t count;
   player_index_t members[max_team_size];
 
-  bool valid(int round) const {
-    auto req = Requirement::value[round];
+  bool valid(quest_index_t quest) const {
+    auto req = Requirement::value[quest];
     if (count != req)
       return false;
 
@@ -40,15 +40,15 @@ struct Quest {
   player_count_t count;
   QuestCard cards[max_team_size];
 
-  void reset(int round) {
-    count = Requirement::value[round];
+  void reset(quest_index_t quest) {
+    count = Requirement::value[quest];
     for (player_index_t i = 0; i < count; ++i) {
       cards[i] = QuestCard::Success;
     }
   }
 
-  bool valid(int round) const {
-    auto req = Requirement::value[round];
+  bool valid(quest_index_t quest) const {
+    auto req = Requirement::value[quest];
     if (count != req)
       return false;
     return true;
@@ -87,37 +87,37 @@ struct BallotBox {
 template <>
 struct TeamBuildRequirement<5> {
   static constexpr player_count_t max_size = 3;
-  static constexpr player_count_t value[round_count] = {2, 3, 2, 3, 3};
+  static constexpr player_count_t value[quest_count] = {2, 3, 2, 3, 3};
 };
 
 template <>
 struct TeamBuildRequirement<6> {
   static constexpr player_count_t max_size = 4;
-  static constexpr player_count_t value[round_count] = {2, 3, 4, 3, 4};
+  static constexpr player_count_t value[quest_count] = {2, 3, 4, 3, 4};
 };
 
 template <>
 struct TeamBuildRequirement<7> {
   static constexpr player_count_t max_size = 4;
-  static constexpr player_count_t value[round_count] = {2, 3, 3, 4, 4};
+  static constexpr player_count_t value[quest_count] = {2, 3, 3, 4, 4};
 };
 
 template <>
 struct TeamBuildRequirement<8> {
   static constexpr player_count_t max_size = 5;
-  static constexpr player_count_t value[round_count] = {3, 4, 4, 5, 5};
+  static constexpr player_count_t value[quest_count] = {3, 4, 4, 5, 5};
 };
 
 template <>
 struct TeamBuildRequirement<9> {
   static constexpr player_count_t max_size = 5;
-  static constexpr player_count_t value[round_count] = {3, 4, 4, 5, 5};
+  static constexpr player_count_t value[quest_count] = {3, 4, 4, 5, 5};
 };
 
 template <>
 struct TeamBuildRequirement<10> {
   static constexpr player_count_t max_size = 5;
-  static constexpr player_count_t value[round_count] = {3, 4, 4, 5, 5};
+  static constexpr player_count_t value[quest_count] = {3, 4, 4, 5, 5};
 };
 
 }  // namespace avalon

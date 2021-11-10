@@ -30,7 +30,7 @@ class GameStatus {
     ballot_box_.reset();
     result_ = GameResult::StillInProgress;
     phase_ = GamePhase::RoundEnded;
-    round_ = -1;
+    quest_ = -1;
     learder_ = -1;
     succeed_quest_count_ = 0;
     voted_ = 0;
@@ -41,14 +41,15 @@ class GameStatus {
   inline GamePhase phase() const { return phase_; }
   inline player_index_t leader() const { return learder_; }
   inline player_index_t merlin() const { return merlin_index_; }
-  inline round_index_t round() const { return round_; }
-  inline round_count_t voted() const { return voted_; }
-  inline round_count_t succeed_quest_count() const {
+  inline quest_index_t quest() const { return quest_; }
+  inline quest_index_t round() const { return round_; }
+  inline quest_count_t voted() const { return voted_; }
+  inline quest_count_t succeed_quest_count() const {
     return succeed_quest_count_;
   }
 
   void setup(player_index_t merlin) {
-    AVALON_CHECK(-1 == round_, return;);
+    AVALON_CHECK(-1 == quest_, return;);
     merlin_index_ = merlin;
   }
 
@@ -59,18 +60,19 @@ class GameStatus {
     ballot_box_.reset();
     assign_next_leader();
     phase_ = GamePhase::TeamBuilding;
+    ++round_;
     if (voted_ == 0)
-      ++round_;
+      ++quest_;
     return true;
   }
 
   bool assign_team(Team<TCount> team) {
     AVALON_CHECK(GamePhase::TeamBuilding == phase_, return false;);
 
-    if (!team.valid(round_))
+    if (!team.valid(quest_))
       return false;
     team_ = team;
-    quest_.reset(round_);
+    quests_.reset(quest_);
     phase_ = GamePhase::TeamBuildVoting;
     return true;
   }
@@ -103,16 +105,16 @@ class GameStatus {
     AVALON_CHECK(GamePhase::QuestDetermining == phase_, return;);
 
     player_count_t fail = 0;
-    for (player_index_t i = 0; i < quest_.count; ++i) {
-      if (QuestCard::Fail == quest_.cards[i])
+    for (player_index_t i = 0; i < quests_.count; ++i) {
+      if (QuestCard::Fail == quests_.cards[i])
         ++fail;
     }
 
-    if (fail < quest_failure_threshold<TCount>(round_)) {
+    if (fail < quest_failure_threshold<TCount>(quest_)) {
       ++succeed_quest_count_;
     }
 
-    const auto failed_quest_count = round_ - succeed_quest_count_;
+    const auto failed_quest_count = quest_ - succeed_quest_count_;
     if (succeed_quest_count_ == min_quest_count) {
       phase_ = GamePhase::Assassinating;
     } else if (failed_quest_count == min_quest_count) {
@@ -145,7 +147,7 @@ class GameStatus {
   bool decide(player_index_t p, QuestCard q) {
     for (player_index_t i = 0; i < team_.count; ++i) {
       if (team_.members[i] == p) {
-        quest_.cards[i] = q;
+        quests_.cards[i] = q;
         return true;
       }
     }
@@ -163,14 +165,15 @@ class GameStatus {
   GameResult result_;
   GamePhase phase_;
   BallotBox<TCount> ballot_box_;
+  quest_index_t quest_;
   round_index_t round_;
   player_index_t learder_;
   player_index_t merlin_index_;
-  round_count_t succeed_quest_count_;
-  round_count_t voted_;
+  quest_count_t succeed_quest_count_;
+  quest_count_t voted_;
 
   Team<TCount> team_;
-  Quest<TCount> quest_;
+  Quest<TCount> quests_;
 };
 
 }  // namespace avalon

@@ -52,7 +52,7 @@ TEST(game, quest_succeed) {
 }
 
 template <player_count_t TCount>
-GameStatus<TCount> create_game_auto(round_index_t round,
+GameStatus<TCount> create_game_auto(quest_index_t quest,
                                     player_index_t merlin) {
   GameStatus<TCount> status;
   status.setup(merlin);
@@ -63,13 +63,13 @@ GameStatus<TCount> create_game_auto(round_index_t round,
   }
 
   bool success = true;
-  round_index_t cr = 0;
-  while (status.round() < round) {
+  quest_index_t cr = 0;
+  while (status.quest() < quest) {
     auto phase = status.phase();
     if (phase == GamePhase::Assassinating || phase == GamePhase::GameEnded)
       break;
     status.start_next_round();
-    team.count = status.team_build_requirement[status.round()];
+    team.count = status.team_build_requirement[status.quest()];
     auto valid_team = status.assign_team(team);
     assert(valid_team);
     for (player_index_t p = 0; p < TCount; ++p) {
@@ -98,7 +98,7 @@ TEST(game, team_build_failed) {
   status.setup(1);
   status.start_next_round();
   Team<5> team;
-  team.count = status.team_build_requirement[status.round()];
+  team.count = status.team_build_requirement[status.quest()];
   team.members[0] = 0;
   team.members[1] = 1;
   status.assign_team(team);
@@ -107,7 +107,7 @@ TEST(game, team_build_failed) {
   status.end_vote();
   EXPECT_EQ(1, status.voted());
   EXPECT_EQ(GamePhase::RoundEnded, status.phase());
-  EXPECT_EQ(0, status.round());
+  EXPECT_EQ(0, status.quest());
 }
 
 TEST(game, team_build_failed_5_times) {
@@ -119,11 +119,11 @@ TEST(game, team_build_failed_5_times) {
   team.members[2] = 2;
   for (size_t i = 0; i < 5; ++i) {
     status.start_next_round();
-    team.count = status.team_build_requirement[status.round()];
+    team.count = status.team_build_requirement[status.quest()];
     status.assign_team(team);
     status.end_vote();
     EXPECT_EQ(i + 1, status.voted());
-    EXPECT_EQ(0, status.round());
+    EXPECT_EQ(0, status.quest());
   }
   EXPECT_EQ(GamePhase::GameEnded, status.phase());
   ASSERT_EQ(GameResult::EvilWinned, status.result());
@@ -138,15 +138,15 @@ TEST(game, team_build_failed_4_times_then_reset) {
   team.members[2] = 2;
   for (size_t i = 0; i < 4; ++i) {
     status.start_next_round();
-    team.count = status.team_build_requirement[status.round()];
+    team.count = status.team_build_requirement[status.quest()];
     status.assign_team(team);
     status.end_vote();
     EXPECT_EQ(i + 1, status.voted());
-    EXPECT_EQ(0, status.round());
+    EXPECT_EQ(0, status.quest());
   }
   status.start_next_round();
-  EXPECT_EQ(0, status.round());
-  team.count = status.team_build_requirement[status.round()];
+  EXPECT_EQ(0, status.quest());
+  team.count = status.team_build_requirement[status.quest()];
   status.assign_team(team);
   status.vote(0, Ballot::Approve);
   status.vote(1, Ballot::Approve);
